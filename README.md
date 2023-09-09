@@ -1,8 +1,6 @@
 # Comedy Kernel API
 
-Corny jokes
-
-Comedy Kernel API is a simple API that serves up corny jokes for a good laugh. This API was created by Akriti and is designed to provide you with a steady stream of humorous content.
+Comedy Kernel API is a simple API that serves up corny jokes for a good laugh. This API is designed to provide you with a steady stream of humorous content.
 
 ## Table of Contents
 
@@ -20,15 +18,15 @@ To get started with the Comedy Kernel API, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/comedy-kernel-api.git
+   git clone git@github.com:akritibhusal/comedy-kernel-api.git
    cd comedy-kernel-api
    ```
 
 2. Install the required dependencies:
 
-  ```bash
-  npm install
-  ````
+    ```bash
+    npm install
+    ````
 
 3. Create a `.env` file in the root directory and configure it with your Supabase credentials. 
    You can use the provided `.env.example` as a template.
