@@ -68,5 +68,15 @@
     "id": 14,
     "setup": "What did the full glass say to the empty glass?",
     "punchline": "You look drunk."
+  },
+  {
+    "id": 15,
+    "setup": "How do astronauts serve dinner?",
+    "punchline": "On flying saucers."
+  },
+  {
+    "id": 16,
+    "setup": "How do astronauts organize a party?",
+    "punchline": "They planet."
   }
 ]
