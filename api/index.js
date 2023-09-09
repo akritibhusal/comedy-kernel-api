@@ -13,7 +13,7 @@ app.use(cors());
 
 const getJokes = (res) => {
   try {
-    jokesData = JSON.parse(fs.readFileSync("./jokes.json", "utf8"));
+    jokesData = JSON.parse(fs.readFileSync("../jokes.json", "utf8"));
   } catch (error) {
     console.error(error);
     res.status(500).send({status: 500, message: "Error reading jokes file"});
