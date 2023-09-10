@@ -43,7 +43,6 @@ const server = new ApolloServer({
     }
 
     type Query {
-      hello: String
       status: Status
       jokes: [Joke]
       joke(id: Int!): [Joke]
@@ -56,7 +55,6 @@ const server = new ApolloServer({
   `,
   resolvers: {
     Query: {
-      hello: () => "Hello world!",
       status: () => {
         return {
           status: 200,

@@ -8,7 +8,8 @@ Comedy Kernel API is a simple API that serves up corny jokes for a good laugh. T
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
-  - [Endpoints](#endpoints)
+  - [Queries](#queries)
+  - [Mutations](#mutations)
   - [Example Usage](#example-usage)
 
 ## Installation
@@ -48,24 +49,44 @@ To get started with the Comedy Kernel API, follow these steps:
 
 The Comedy Kernel API provides a simple interface to fetch jokes. You can use this API to integrate jokes into your applications, websites, or simply fetch a joke for some quick humor.
 
-## Endpoints
+## Queries
 
-The following endpoints are available:
-    GET /jokes: Fetch all jokes
-    GET /jokes/:id : Fetch a specific joke
-    POST /joke: Create a new joke
-    POST /jokes: Bulk create new jokes
+The API supports the following queries:
+  status: Fetches the status of the API
+  jokes: Fetches all jokes
+  joke(id): Fetches a specific joke
+
+
+## Mutations
+
+The API supports the following mutations:
+  addJokes: Adds a new joke
+  deleteJoke(id): Deletes a specific joke
 
 ## Example Usage
 
-You can make a GET request to `http://localhost:3000/jokes/1` to receive a joke in the following format 🥕:
+You can make a GET request to `http://localhost:3000/` to receive a joke in the following format 🥕:
 
+Example query:
+```graphql
+    query {
+      jokes {
+        setup
+        punchline
+      }
+    }
+```
+
+Example response:
 ```json
-[
-    {
-        "id": 1,
+{
+  "data": {
+    "jokes": [
+      {
         "setup": "What do you call an angry carrot?",
         "punchline": "A steamed veggie."
-    }
-]
+      }
+    ]
+  }
+}
 ```
