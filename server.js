@@ -1,12 +1,16 @@
-const express = require("express");
-const cors = require("cors");
-const { createClient } = require("@supabase/supabase-js");
-const bodyParser = require("body-parser");
-require("dotenv").config();
+import { ApolloServer, gql } from "apollo-server-express";
+import express from "express";
+import cors from "cors";
+import { createClient } from "@supabase/supabase-js";
+import bodyParser from "body-parser";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
+// Supabase
 const options = {
   auth: {
     persistSession: true,
@@ -20,64 +24,104 @@ const supabase = createClient(
   options
 );
 
+const server = new ApolloServer({
+  typeDefs: gql`
+    type Status {
+      status: Int
+      message: String!
+    }
+
+    input JokeInput {
+      setup: String!
+      punchline: String!
+    }
+
+    type Joke {
+      id: Int
+      setup: String!
+      punchline: String!
+    }
+
+    type Query {
+      hello: String
+      status: Status
+      jokes: [Joke]
+      joke(id: Int!): [Joke]
+    }
+
+    type Mutation {
+      addJokes(jokes: [JokeInput]): [Joke]
+      deleteJoke(id: Int!): Joke
+    }
+  `,
+  resolvers: {
+    Query: {
+      hello: () => "Hello world!",
+      status: () => {
+        return {
+          status: 200,
+          message: "We are live and joking!",
+        };
+      },
+      jokes: async () => {
+        const { data, error } = await supabase.from("jokes").select();
+
+        if (error) {
+          throw new Error(error);
+        }
+        return data;
+      },
+      joke: async (parent, args) => {
+        const { data, error } = await supabase
+          .from("jokes")
+          .select()
+          .eq("id", args.id);
+
+        if (error) {
+          throw new Error(error);
+        }
+        if (!data.length) {
+          throw new Error("Joke not found");
+        }
+        return data;
+      },
+    },
+    Mutation: {
+      addJokes: async (parent, args) => {
+        const jokesList = args.jokes.map((joke) => {
+          return { setup: joke.setup, punchline: joke.punchline };
+        });
+        const { data, error } = await supabase
+          .from("jokes")
+          .insert(jokesList)
+          .select();
+        if (error) {
+          throw new Error(error);
+        }
+        return data;
+      },
+      deleteJoke: async (parent, args) => {
+        const { data, error } = await supabase
+          .from("jokes")
+          .delete()
+          .match({ id: args.id })
+          .select();
+        if (error) {
+          throw new Error(error);
+        }
+        return data;
+      },
+    },
+  },
+});
+
+await server.start();
+server.applyMiddleware({ app });
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use(cors());
-
-/**
- * Routes
- */
-app.get("/status", (req, res) => {
-  res.send({ status: 200, message: "We are live and joking!" });
-});
-
-app.get("/jokes", async (req, res) => {
-  const { data, error } = await supabase.from("jokes").select();
-
-  if (error) {
-    res.status(500).send({ status: 500, message: error });
-  }
-
-  res.send(data);
-});
-
-app.get("/jokes/:id", async (req, res) => {
-  const { data, error } = await supabase
-    .from("jokes")
-    .select()
-    .eq("id", req.params.id);
-
-  if (error) {
-    res.status(500).send({ status: 500, message: error });
-  }
-  if (!data.length) {
-    res.status(404).send({ status: 404, message: "Joke not found" });
-  }
-  res.send(data);
-});
-
-app.post("/joke", async (req, res) => {
-  const { error } = await supabase
-    .from("jokes")
-    .insert({ setup: req.body.setup, punchline: req.body.punchline });
-  if (error) {
-    res.status(500).send({ status: 500, message: error });
-  }
-  res.send({ status: 200, message: "Joke added" });
-});
-
-app.post("/jokes", async (req, res) => {
-  // TODO: Validate the request body using zod or joi
-  const jokesList = req.body.map((joke) => {
-    return { setup: joke.setup, punchline: joke.punchline };
-  });
-  const { error } = await supabase.from("jokes").insert(jokesList);
-  if (error) {
-    res.status(500).send({ status: 500, message: error });
-  }
-  res.send({ status: 200, message: "Jokes added 👏" });
-});
 
 app.listen(port, () => {
   console.log(`Listening at port :${port}, JK!`);
